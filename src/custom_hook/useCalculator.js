@@ -1,73 +1,37 @@
 import { useReducer } from 'react'
 
 const initialState = {
-  expression: '',
-  displayEXP: '',
-  result: '0',
+  expression: '', // String to store current expression
+  result: '', // String to store the result
 }
 
-function reducer(state, action) {
+const calculatorReducer = (state, action) => {
   switch (action.type) {
-    case 'ADD_CHARACTER':
-      return {
-        ...state,
-        expression: state.expression + action.payload,
-        displayEXP: state.displayEXP + action.payload,
-      }
-    case 'ADD_SCI_FUNC':
-      let { func, symbol } = action.payload
-      let newExpression = state.expression
-      let newDisplayEXP = state.displayEXP
-
-      if (['π', 'e'].includes(func)) {
-        newExpression += func
-        newDisplayEXP += symbol
-      } else {
-        newExpression += `${func}(`
-        newDisplayEXP += `${symbol}(`
-      }
-
-      return {
-        ...state,
-        expression: newExpression,
-        displayEXP: newDisplayEXP,
-      }
-    case 'ADD_CLOSING_BRACKET':
-      return {
-        ...state,
-        expression: state.expression + ')',
-        displayEXP: state.displayEXP + ')',
-      }
-    case 'CALCULATE_RESULT':
-      try {
-        const compute = eval(
-          state.expression +
-            ')'.repeat(
-              (state.expression.match(/\(/g) || []).length -
-                (state.expression.match(/\)/g) || []).length
-            )
-        )
-        const result = parseFloat(compute.toFixed(4))
-        return { ...state, result: result.toString() }
-      } catch {
-        return { ...state, result: 'An Error Occurred!' }
-      }
+    case 'APPEND':
+      return { ...state, expression: state.expression + action.payload }
     case 'CLEAR':
       return initialState
-    case 'DELETE_LAST':
-      return {
-        ...state,
-        expression: state.expression.slice(0, -1),
-        displayEXP: state.displayEXP.slice(0, -1),
+    case 'DELETE':
+      return { ...state, expression: state.expression.slice(0, -1) }
+    case 'CALCULATE':
+      try {
+        const result = eval(state.expression) // Evaluate the expression
+        return { ...state, result: result.toString() }
+      } catch (error) {
+        return { ...state, result: 'Error' }
       }
-    case 'FACTORIAL':
-      const lastNum = extractLastNum(state.expression)
-      if (lastNum != null) {
-        const num = parseFloat(lastNum)
+    case 'EVAL_TRIG_FUNCTION':
+      const { expression } = state
+      const trigFunction = action.payload // 'sin', 'cos', 'tan'
+      const match = expression.match(new RegExp(`${trigFunction}\\s*(\\d+)`))
+      if (match) {
+        const value = match[1]
+        const radians = (value * Math.PI) / 180 // Convert degrees to radians
+        const trigResult = Math[trigFunction](radians)
         return {
           ...state,
-          expression: state.expression.replace(lastNum, factorial(num)),
-          displayEXP: state.displayEXP + '!',
+          expression: `${trigFunction} ${value}`,
+          result: trigResult.toString(),
         }
       }
       return state
@@ -76,19 +40,10 @@ function reducer(state, action) {
   }
 }
 
-function extractLastNum(exp) {
-  const numbers = exp.match(/(\d+(\.\d+)?|\.\d+)(?=\D*$)/g) // Matches the last number
-  return numbers ? numbers[numbers.length - 1] : null
-}
-
-function factorial(n) {
-  let result = 1
-  for (let i = 1; i <= n; i++) result *= i
-  return result
-}
-
-export default function useCalculator() {
-  const [state, dispatch] = useReducer(reducer, initialState)
+const useCalculator = () => {
+  const [state, dispatch] = useReducer(calculatorReducer, initialState)
 
   return { state, dispatch }
 }
+
+export default useCalculator
