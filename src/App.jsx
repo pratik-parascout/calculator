@@ -1,14 +1,12 @@
-import Calculator from "./components/Calculator"
+import React from 'react'
+import Calculator from './components/Calculator'
 
 const App = () => {
   return (
-    <div className="flex flex-col items-center justify-center align gap-6 h-screen">
+    <div className="app-container flex items-center justify-center min-h-screen bg-slate-500">
       <Calculator />
-      <p>
-        Developed by 🕹️{' '}
-        <span className=" font-semibold text-red-500">Pratik Kumar</span>
-      </p>
     </div>
   )
 }
+
 export default App

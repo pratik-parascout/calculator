@@ -1,80 +1,71 @@
-import { useState } from "react"
-import DisplayWindow from "./DisplayWindow"
-import KeyWindow from "./KeyWindow"
+import React, { useState } from 'react'
+import DisplayWindow from './DisplayWindow'
+import KeyWindow from './KeyWindow'
+import useCalculator from '../custom_hook/useCalculator'
 
 const Calculator = () => {
+  const { state, dispatch } = useCalculator()
+  const [theme, setTheme] = useState('light') // State to track current theme
 
-     const [expression, setExpression] = useState('')
-     const [displayEXP, setDisplayEXP] = useState('')
-     const [result, setResult] = useState('0')
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light')
+  }
 
-     const sciFunc = {
-       sin: 'Math.sin',
-       cos: 'Math.cos',
-       tan: 'Math.tan',
-       ln: 'Math.log',
-       log: 'Math.log10',
-       π: 'Math.PI',
-       e: 'Math.E',
-       '^': '**',
-       '√': 'Math.sqrt',
-     }
+  const handleButton = (value) => {
+    // Implement your button handling logic here
+    if (value === 'AC') {
+      dispatch({ type: 'CLEAR' })
+    } else if (value === 'DEL') {
+      dispatch({ type: 'DELETE_LAST' })
+    } else if (Object.keys(sciFunc).includes(value)) {
+      dispatch({ type: 'ADD_SCI_FUNC', payload: sciFunc[value] })
+    } else if (value === '!') {
+      dispatch({ type: 'FACTORIAL' })
+    } else if (value === '=') {
+      dispatch({ type: 'CALCULATE_RESULT' })
+    } else if (value === ')') {
+      dispatch({ type: 'ADD_CLOSING_BRACKET' })
+    } else {
+      dispatch({ type: 'ADD_CHARACTER', payload: value })
+    }
+  }
 
-     function calcResult() {
-       if (expression.length !== 0) {
-         try {
-           let compute = eval(expression)
-           compute = parseFloat(compute.toFixed(4))
-           setResult(compute)
-         } catch (error) {
-           setResult('An Error Occurred!')
-         }
-       } else {
-         setResult('An Error Occurred!')
-       }
-     }
+  const themeClass =
+    theme === 'light' ? 'bg-white text-black' : 'bg-gray-800 text-white' // Adjust classes for light and dark themes
 
-     function handleButton(value) {
-       if (value === 'AC') {
-         setExpression('')
-         setDisplayEXP('')
-         setResult('0')
-       } else if (value === 'DEL') {
-         setDisplayEXP(displayEXP.slice(0, -1))
-         setExpression(expression.slice(0, -1))
-       } else if (sciFunc.hasOwnProperty(value)) {
-         setDisplayEXP(displayEXP + value)
-         setExpression(expression + sciFunc[value])
-       } else if (value === '!') {
-         const lastNum = extractLastNum(expression)
-         if (lastNum != null) {
-           const num = parseFloat(lastNum)
-           setDisplayEXP(displayEXP + value)
-           setExpression(expression.replace(lastNum, factorial(num)))
-         }
-       } else if (value === '=') calcResult()
-       else {
-         setExpression(expression + value)
-         setDisplayEXP(displayEXP + value)
-       }
-     }
+  // Define sciFunc object here
+  const sciFunc = {
+    sin: 'Math.sin',
+    cos: 'Math.cos',
+    tan: 'Math.tan',
+    ln: 'Math.log',
+    log: 'Math.log10',
+    π: 'Math.PI',
+    e: 'Math.E',
+    '^': '**',
+    '√': 'Math.sqrt',
+  }
 
-     function factorial(n) {
-       let result = 1
-       for (let i = 1; i <= n; i++) result *= i
-       return result
-     }
-
-     function extractLastNum(exp) {
-       const numbers = exp.match(/\d+/g)
-       return numbers ? numbers[numbers.length - 1] : null
-     }
-
-     return (
-       <div className="calculator">
-         <DisplayWindow expression={displayEXP} result={result} />
-         <KeyWindow handleButton={handleButton} />
-       </div>
-     )
+  return (
+    <div
+      className={`calculator p-4 rounded-lg shadow-md max-w-md mx-auto ${themeClass}`}
+    >
+      <div className="flex justify-end mb-2">
+        <button
+          className="toggle-theme-btn p-2 rounded-full bg-gray-200 hover:bg-gray-300"
+          onClick={toggleTheme}
+        >
+          {theme === 'light' ? '🌙' : '☀️'} {/* Emoji for theme toggle */}
+        </button>
+      </div>
+      <DisplayWindow
+        expression={state.displayEXP}
+        result={state.result}
+        theme={theme}
+      />
+      <KeyWindow handleButton={handleButton} theme={theme} sciFunc={sciFunc} />
+    </div>
+  )
 }
+
 export default Calculator
