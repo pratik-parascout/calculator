@@ -12,41 +12,40 @@ const Calculator = () => {
   }
 
   const handleButton = (value) => {
-    // Implement your button handling logic here
-    if (value === 'AC') {
-      dispatch({ type: 'CLEAR' })
-    } else if (value === 'DEL') {
-      dispatch({ type: 'DELETE_LAST' })
-    } else if (Object.keys(sciFunc).includes(value)) {
-      dispatch({ type: 'ADD_SCI_FUNC', payload: sciFunc[value] })
-    } else if (value === '!') {
-      dispatch({ type: 'FACTORIAL' })
-    } else if (value === '=') {
-      dispatch({ type: 'CALCULATE_RESULT' })
-    } else if (value === ')') {
-      dispatch({ type: 'ADD_CLOSING_BRACKET' })
-    } else {
-      dispatch({ type: 'ADD_CHARACTER', payload: value })
+    switch (value) {
+      case 'AC':
+        dispatch({ type: 'CLEAR' })
+        break
+      case 'DEL':
+        dispatch({ type: 'DELETE_LAST' })
+        break
+      case '=':
+        dispatch({ type: 'CALCULATE_RESULT' })
+        break
+      case '!':
+        dispatch({ type: 'FACTORIAL' })
+        break
+      case 'sin':
+      case 'cos':
+      case 'tan':
+      case 'ln':
+      case 'log':
+      case '√':
+        dispatch({
+          type: 'ADD_SCI_FUNC',
+          payload: {
+            func: `Math.${value}`,
+            symbol: `${value}`,
+          },
+        })
+        break
+      default:
+        dispatch({ type: 'ADD_CHARACTER', payload: value })
+        break
     }
   }
 
-  const themeClass =
-    theme === 'light' ? 'bg-white text-black' : 'bg-gray-800 text-white' // Adjust classes for light and dark themes
 
-  // Define sciFunc object here
-  const sciFunc = {
-    sin: 'Math.sin',
-    cos: 'Math.cos',
-    tan: 'Math.tan',
-    ln: 'Math.log',
-    log: 'Math.log10',
-    π: 'Math.PI',
-    e: 'Math.E',
-    '^': '**',
-    '√': 'Math.sqrt',
-  }
-
-  // Handle keyboard events
   useEffect(() => {
     const handleKeyDown = (event) => {
       const { key } = event
@@ -58,11 +57,11 @@ const Calculator = () => {
         key === '*' ||
         key === '/'
       ) {
-        handleButton(key) // Trigger button press for numbers and basic operators
+        handleButton(key)
       } else if (key === 'Enter') {
-        handleButton('=') // Trigger '=' button press for calculation
+        handleButton('=')
       } else if (key === 'Backspace') {
-        handleButton('DEL') // Trigger 'DEL' button press for delete
+        handleButton('DEL')
       }
     }
 
@@ -73,6 +72,9 @@ const Calculator = () => {
     }
   }, []) // Empty dependency array ensures the effect runs only once
 
+  const themeClass =
+    theme === 'light' ? 'bg-white text-black' : 'bg-gray-800 text-white'
+
   return (
     <div
       className={`calculator p-4 rounded-lg shadow-md max-w-md mx-auto ${themeClass}`}
@@ -82,15 +84,11 @@ const Calculator = () => {
           className="toggle-theme-btn p-2 rounded-full bg-gray-200 hover:bg-gray-300"
           onClick={toggleTheme}
         >
-          {theme === 'light' ? '🌙' : '☀️'} {/* Emoji for theme toggle */}
+          {theme === 'light' ? '🌙' : '☀️'}
         </button>
       </div>
-      <DisplayWindow
-        expression={state.displayEXP}
-        result={state.result}
-        theme={theme}
-      />
-      <KeyWindow handleButton={handleButton} theme={theme} sciFunc={sciFunc} />
+      <DisplayWindow expression={state.displayEXP} result={state.result} />
+      <KeyWindow handleButton={handleButton} />
     </div>
   )
 }

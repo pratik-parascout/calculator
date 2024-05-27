@@ -15,15 +15,16 @@ function reducer(state, action) {
         displayEXP: state.displayEXP + action.payload,
       }
     case 'ADD_SCI_FUNC':
+      let { func, symbol } = action.payload
       let newExpression = state.expression
       let newDisplayEXP = state.displayEXP
 
-      if (['Math.PI', 'Math.E'].includes(action.payload.func)) {
-        newExpression += action.payload.func
-        newDisplayEXP += action.payload.symbol
+      if (['π', 'e'].includes(func)) {
+        newExpression += func
+        newDisplayEXP += symbol
       } else {
-        newExpression += action.payload.func + '('
-        newDisplayEXP += action.payload.symbol + '('
+        newExpression += `${func}(`
+        newDisplayEXP += `${symbol}(`
       }
 
       return {
