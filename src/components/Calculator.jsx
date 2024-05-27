@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import DisplayWindow from './DisplayWindow'
 import KeyWindow from './KeyWindow'
 import useCalculator from '../custom_hook/useCalculator'
@@ -45,6 +45,33 @@ const Calculator = () => {
     '^': '**',
     '√': 'Math.sqrt',
   }
+
+  // Handle keyboard events
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const { key } = event
+      if (
+        /\d/.test(key) ||
+        key === '.' ||
+        key === '+' ||
+        key === '-' ||
+        key === '*' ||
+        key === '/'
+      ) {
+        handleButton(key) // Trigger button press for numbers and basic operators
+      } else if (key === 'Enter') {
+        handleButton('=') // Trigger '=' button press for calculation
+      } else if (key === 'Backspace') {
+        handleButton('DEL') // Trigger 'DEL' button press for delete
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, []) // Empty dependency array ensures the effect runs only once
 
   return (
     <div
