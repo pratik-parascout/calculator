@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       width: {
-        128: '600px',
+        128: '325px',
       },
       colors: {
         nearRed: '#A91D3A',

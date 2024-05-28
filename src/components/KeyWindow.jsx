@@ -27,7 +27,7 @@ const KeysWindow = ({ handleButton }) => {
   ]
 
   return (
-    <div className="keysWindow bg-gray-200 rounded-lg p-2">
+    <div className="keysWindow bg-gray-200 rounded-lg p-2 w-128">
       <div className="keys_scientific grid grid-cols-5 gap-2 mb-2">
         {sciKeys.map((item, index) => (
           <button

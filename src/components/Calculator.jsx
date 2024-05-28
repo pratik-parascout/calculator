@@ -102,8 +102,9 @@ const Calculator = () => {
   }
 
   return (
-    <div className="calculator flex flex-col justify-center items-center p-4 rounded-lg shadow-md max-w-md mx-auto bg-white text-black">
+    <div className="calculator flex flex-col justify-center items-center p-4 rounded-lg shadow-md max-w-md mx-auto bg-white text-black overflow-hidden">
       <DisplayWindow expression={displayEXP} result={result} />
+      <hr />
       <KeyWindow handleButton={handleButton} />
     </div>
   )
